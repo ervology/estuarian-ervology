@@ -1,6 +1,6 @@
 import qualified Data.List as List
 import qualified Data.Set as Set
-import qualified Combinatorics
+import Data.List.HT (tails)
 
 data Scale = EdxScale [NoteData] | CPSScale [NoteData] deriving (Show, Eq)
 
@@ -78,14 +78,24 @@ type SetSize = Int
 type Factor = Rational 
 type Generator = Int 
 
-putWithinPeriod p n 
-    | n < p    = n  
-    | otherwise = putWithinPeriod p n/p 
+-- from the `combinatorics` library
+combinatoricTuples :: Int -> [a] -> [[a]]
+combinatoricTuples =
+   let go r =
+         case compare r 0 of
+            LT -> const []
+            EQ -> const [[]]
+            GT -> concatMap (\(y:ys) -> map (y:) (go (r-1) ys)) . init . tails
+   in  go
+
+putWithinPeriod p n = 
+    if n < p 
+        then n 
+        else putWithinPeriod p n/p
 
 cpsRatios :: (Integral b, Fractional b) => b -> Int -> [b] -> [b]
 cpsRatios period n xs = 
-    let combinations = map product $  Combinatorics.tuples n xs
+    let combinations = map product $ combinatoricTuples n xs
         max = maximum combinations
         ratios = map (\x -> putWithinPeriod period (x/max + 1)) combinations
     in ratios 
-
