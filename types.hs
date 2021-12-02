@@ -1,6 +1,6 @@
-
+import qualified Data.List as List
 import qualified Data.Set as Set
-
+import qualified Combinatorics
 
 data Scale = EdxScale [NoteData] | CPSScale [NoteData] deriving (Show, Eq)
 
@@ -50,13 +50,13 @@ scaleToMidiInterval:: Scale -> [Float]
 scaleToMidiInterval scale = map (\x -> (fst x)* 0.01) $ scaleToNotes scale
 
 scaleToMelody:: Scale -> [Degree] -> [Float]
-scaleToMelody scale degs = ......
+scaleToMelody scale degs = undefined
 
 scaleToChord:: Scale -> [Degree] -> [Float]
-scaleToChord scale degs = ......
+scaleToChord scale degs = undefined
 
 scaleToChords:: Scale -> [[Degree]] -> [Float]
-scaleToChords scale degs = ......
+scaleToChords scale degs = undefined
 
 -- here it is implied that the convertion from cents to midi interval takes place, as in: 1200 cents to 12.0 midi interval
 scaleToPunctualCode :: Scale -> String
@@ -71,22 +71,21 @@ scaleToTidalCode scale =
     in "here goes some Tidal code"
 
 
--
-
-
-
-
-
 
 ----- to build the CPS and MOS
 
-type Period = Rational 
 type SetSize = Int 
 type Factor = Rational 
 type Generator = Int 
 
--- makeCPS :: Period SetSize [Factor]
+putWithinPeriod p n 
+    | n < p    = n  
+    | otherwise = putWithinPeriod p n/p 
 
--- makeMOS :: Period SetSize [Generator]
-
+cpsRatios :: (Integral b, Fractional b) => b -> Int -> [b] -> [b]
+cpsRatios period n xs = 
+    let combinations = map product $  Combinatorics.tuples n xs
+        max = maximum combinations
+        ratios = map (\x -> putWithinPeriod period (x/max + 1)) combinations
+    in ratios 
 
