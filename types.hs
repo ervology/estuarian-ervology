@@ -6,6 +6,7 @@ data Scale = EdxScale [NoteData] | CPSScale [NoteData] deriving (Show, Eq)
 
 
 type Period = Double
+type SetSize = Int
 
 type Ratio = Double
 
@@ -88,11 +89,13 @@ combinatoricTuples =
             GT -> concatMap (\(y:ys) -> map (y:) (go (r-1) ys)) . init . tails
    in  go
 
+putWithinPeriod :: (Ord a, Fractional a) => a -> a -> a
 putWithinPeriod p n
     | (n < 1) = putWithinPeriod p (n*p) 
     | (n >= 1 && n < p) = n 
     | otherwise = putWithinPeriod p (n/p)
 
+makeCPS :: Period -> SetSize -> [Ratio] -> [NoteData]
 makeCPS period n xs = 
     let combinations = map product $ combinatoricTuples n xs
         max = maximum combinations
