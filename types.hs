@@ -93,8 +93,8 @@ putWithinPeriod p n
     | (n >= 1 && n < p) = n 
     | otherwise = putWithinPeriod p (n/p)
 
-cpsRatios period n xs = 
+makeCPS period n xs = 
     let combinations = map product $ combinatoricTuples n xs
         max = maximum combinations
         ratios = (List.sort) $ map (\x -> putWithinPeriod period (x/max)) combinations
-    in ratios 
+    in map (CPSNote 2) ratios 
