@@ -5,9 +5,13 @@ import qualified Data.Set as Set
 data Scale = EdxScale [NoteData] | CPSScale [NoteData] deriving (Show, Eq)
 
 
---             Bounding: Period   Ratio        Bounding: Period   Ratio
-data NoteData = EdxNote Rational Rational | CPSNote (Set.Set Rational) Rational Rational deriving (Show, Eq)
+type Period = Double
 
+type Ratio = Double
+
+
+data NoteData = EdxNote Period Ratio | CPSNote Period Ratio deriving (Show, Eq)
+                                                
 type Degree = Int  -- esto eventualmente se debe ir
 
 type Note = (Float, Int) -- the float is in cents and the int is the degree
@@ -31,7 +35,7 @@ getNote scale deg =    -- !!!!!!!!!!!!!!!!!!!!!!!!
         cent = noteDataToCent $ fst withDegree -- resolver el como ver el grado con la nota para ocnvertir esa nota a cent
     in (cent,snd withDegree)
 
-addDegrees:: Scale -> [(NoteData,Int)]
+addDegrees:: Scale -> [(NoteData,Degree)]
 addDegrees (EdxScale scale) = zip scale [0..]
 addDegrees (CPSScale scale) = zip scale [0..]
 
@@ -42,21 +46,32 @@ scaleToNotes scale = map (getNote scale) $ map (snd) $ addDegrees scale
 -- chordToNotes :: Scale -> [Degree] -> [Float]
 -- chordToNotes scale degs = map (getNote scale) degs
 
+scaleToMidiInterval:: Scale -> [Float]
+scaleToMidiInterval scale = map (\x -> (fst x)* 0.01) $ scaleToNotes scale
+
+scaleToMelody:: Scale -> [Degree] -> [Float]
+scaleToMelody scale degs = ......
+
+scaleToChord:: Scale -> [Degree] -> [Float]
+scaleToChord scale degs = ......
+
+scaleToChords:: Scale -> [[Degree]] -> [Float]
+scaleToChords scale degs = ......
+
 -- here it is implied that the convertion from cents to midi interval takes place, as in: 1200 cents to 12.0 midi interval
 scaleToPunctualCode :: Scale -> String
 scaleToPunctualCode scale = 
-  let midis = scaleToNotes scale
-  in "notes << [" ++ (show midis) ++ "];"
+  let midis = scaleToMidiInterval scale
+  in "notes << " ++ (show midis) ++ ";"
+
 
 scaleToTidalCode :: Scale -> String
 scaleToTidalCode scale = 
-    let midis = scaleToNotes scale
+    let midis = scaleToMidiInterval scale
     in "here goes some Tidal code"
 
 
--- here we could create a function that provides multiple lines of code with multiple chords
--- chordsToPunctualCode
--- chordsToTidalCode
+-
 
 
 
