@@ -88,14 +88,13 @@ combinatoricTuples =
             GT -> concatMap (\(y:ys) -> map (y:) (go (r-1) ys)) . init . tails
    in  go
 
-putWithinPeriod p n = 
-    if n < p 
-        then n 
-        else putWithinPeriod p n/p
+putWithinPeriod p n
+    | (n < 1) = putWithinPeriod p (n*p) 
+    | (n >= 1 && n < p) = n 
+    | otherwise = putWithinPeriod p (n/p)
 
-cpsRatios :: (Integral b, Fractional b) => b -> Int -> [b] -> [b]
 cpsRatios period n xs = 
     let combinations = map product $ combinatoricTuples n xs
         max = maximum combinations
-        ratios = map (\x -> putWithinPeriod period (x/max + 1)) combinations
+        ratios = (List.sort) $ map (\x -> putWithinPeriod period (x/max)) combinations
     in ratios 
